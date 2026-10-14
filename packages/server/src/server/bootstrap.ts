@@ -1,3 +1,4 @@
+import type { NotificationConfig } from "./notifications/notification-config.js";
 import type { PluginRegistries } from "@getpaseo/protocol/plugin-registry";
 import { describeHookWorkspace } from "./plugins/lifecycle/index.js";
 import express from "express";
@@ -389,6 +390,7 @@ export type DaemonLifecycleIntent =
     };
 
 export interface PaseoDaemonConfig {
+  notifications?: NotificationConfig;
   listen: string;
   paseoHome: string;
   daemonVersion?: string;
@@ -1695,6 +1697,7 @@ export async function createPaseoDaemon(
                 daemonStatusRpc: dependencies.serverFeatureOverrides?.daemonStatusRpc,
                 relayConfig: dependencies.serverFeatureOverrides?.relayConfig,
                 startPaused: true,
+                notifications: config.notifications,
               },
               workspaceAutoName,
               daemonAuth,

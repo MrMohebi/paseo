@@ -670,6 +670,7 @@ interface ClientActivity {
   lastActivityAt: Date;
   appVisible: boolean;
   appVisibilityChangedAt: Date;
+  receivedAtMs: number;
 }
 
 export class Session {
@@ -1518,6 +1519,10 @@ export class Session {
 
   public getClientActivity(source = this.delivery.currentSource): ClientActivity | null {
     return source ? (this.clientSources.get(source)?.activity ?? null) : null;
+  }
+
+  public getClientPushToken(source: object): string | null {
+    return this.clientSources.get(source)?.pushToken ?? null;
   }
 
   private getFocusedAgentSelectionForCwd(cwd: string):
@@ -4956,6 +4961,7 @@ export class Session {
     const metadata = this.currentClientMetadata();
     metadata.activity = {
       deviceType: msg.deviceType,
+      receivedAtMs: Date.now(),
       focusedAgentId: msg.focusedAgentId,
       focusedTerminalId,
       lastActivityAt: new Date(msg.lastActivityAt),
@@ -4986,8 +4992,11 @@ export class Session {
    * Handle push token registration
    */
   private handleRegisterPushToken(token: string): void {
-    this.currentClientMetadata().pushToken = token;
+    const metadata = this.currentClientMetadata();
     this.pushNotifications.renew(token);
+    if (metadata.pushToken && metadata.pushToken !== token)
+      this.pushNotifications.revoke(metadata.pushToken);
+    metadata.pushToken = token;
     this.sessionLogger.info("Registered push token");
   }
 
