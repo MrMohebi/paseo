@@ -12,7 +12,7 @@ Paseo is an agentic development environment for running coding agents, editing f
 
 ## Desktop app (recommended)
 
-Download this fork’s Mac, Linux, Windows, and source-only Android packages from the [GitHub releases page](https://github.com/MrMohebi/paseo/releases). Mac builds are ad-hoc signed and unnotarized. The Android APK uses the separate ntfy app for notifications. Upstream mobile store apps remain compatible with the fork daemon.
+Download this fork’s Mac, Linux, and Windows packages from the [GitHub releases page](https://github.com/MrMohebi/paseo/releases). Mac builds are ad-hoc signed and unnotarized. Use the separate ntfy Android app for self-hosted notifications; this release does not include an Android APK. Upstream mobile store apps remain compatible with the fork daemon.
 
 The desktop app bundles its own daemon and starts it automatically, no separate install required. On first launch you'll see a brief startup screen, then connect from your phone using **Settings → your host → Pair Device**.
 

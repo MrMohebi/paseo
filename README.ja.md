@@ -71,7 +71,7 @@ Paseo はコーディングエージェントを管理するローカルサー�
 
 ### デスクトップアプリ（推奨）
 
-Mac、Linux、Windows、Android 版は[このフォークのリリースページ](https://github.com/MrMohebi/paseo/releases)からダウンロードしてください。Mac 版はアドホック署名で、Apple の公証はありません。Android APK の通知には別途 ntfy アプリが必要です。
+Mac、Linux、Windows 版は[このフォークのリリースページ](https://github.com/MrMohebi/paseo/releases)からダウンロードしてください。Mac 版はアドホック署名で、Apple の公証はありません。Android の通知には別途 ntfy アプリを利用できます。
 
 スマートフォンから接続するには、Settings 画面に表示される QR コードをスキャンしてください。
 

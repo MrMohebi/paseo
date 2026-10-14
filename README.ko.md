@@ -65,7 +65,7 @@ Paseo는 코딩 에이전트를 관리하는 로컬 서버인 데몬을 실행�
 
 ### 데스크톱 앱(권장)
 
-Mac, Linux, Windows 및 Android 버전은 [이 포크의 릴리스 페이지](https://github.com/MrMohebi/paseo/releases)에서 다운로드하세요. Mac 빌드는 임시 서명되었으며 Apple 공증은 없습니다. Android APK의 알림에는 별도의 ntfy 앱이 필요합니다.
+Mac, Linux 및 Windows 버전은 [이 포크의 릴리스 페이지](https://github.com/MrMohebi/paseo/releases)에서 다운로드하세요. Mac 빌드는 임시 서명되었으며 Apple 공증은 없습니다. Android 알림에는 별도의 ntfy 앱을 사용할 수 있습니다.
 
 휴대폰에서 연결하려면 **설정 → 호스트 → 기기 페어링**을 여세요.
 

@@ -21,7 +21,7 @@ Notification fixes and self-hosted ntfy support in the [MrMohebi fork](https://g
 ### Distribution
 
 - Includes the upstream desktop asset set: Mac ARM/Intel DMG and ZIP packages, Linux amd64 DEB/RPM/AppImage/tarball, Windows x64/ARM installers and ZIPs, and updater metadata. Mac builds are ad-hoc signed and unnotarized; Windows builds are unsigned.
-- Includes a privately signed source-only Android APK. Native Expo push and QR scanning are excluded from this APK; use the separate ntfy Android app for notifications. Upstream mobile store apps remain compatible with the fixed daemon. The fork Android signing key differs from upstream, so this APK cannot upgrade an upstream installation in place.
+- Mac ARM/Intel and Debian 13 amd64 packages are the supported downloads for this release. Other desktop assets were already generated and remain available. An Android APK is not included; use an upstream mobile store app with the fixed daemon, or the separate ntfy Android app for notifications.
 - Docker images support `linux/amd64` and `linux/arm64`: `ghcr.io/mrmohebi/paseo:0.12.0`.
 - Legacy routing remains the default. Enable `always_push` explicitly for the notification behavior described above. Provider submission and Expo receipts do not prove display on a physical phone.
 
