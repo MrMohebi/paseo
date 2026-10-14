@@ -87,7 +87,7 @@ You need at least one agent CLI installed and configured with your credentials:
 
 ### Desktop app (recommended)
 
-Download the Mac Apple Silicon build from the [fork releases page](https://github.com/MrMohebi/paseo/releases). It bundles the fixed daemon and starts it automatically. Fork Mac builds are ad-hoc signed and unnotarized; see the release notes for installation limitations. Other platforms remain available from [upstream](https://paseo.sh/download).
+Download Mac, Linux, and Windows packages from the [fork releases page](https://github.com/MrMohebi/paseo/releases). For Debian 13 amd64, download `Paseo-0.12.0-amd64.deb` and run `sudo apt install ./Paseo-0.12.0-amd64.deb`. Each desktop package bundles the fixed daemon. Mac builds are ad-hoc signed and unnotarized. The fork’s source-only Android APK uses the separate ntfy app for notifications and excludes native Expo push and QR scanning; the upstream mobile store app remains compatible with this daemon. See the release notes and [Android build guide](docs/android.md) for signing and installation limitations.
 
 To connect from your phone, open **Settings → your host → Pair Device**.
 
