@@ -75,7 +75,7 @@ these fields during installation.
 
 `requirements` is an optional object. Its currently supported key, `paseo`, accepts an npm semver
 range. An omitted `requirements.paseo` means `<0.8.0`: the plugin predates the first breaking
-plugin release. Paseo 0.8 and later reject it with a link to the [migration guide](migration).
+plugin release. Paseo 0.8 and later reject it with a link to the [migration guide](migration.md).
 Empty strings, invalid ranges, and unknown manifest requirement keys are rejected.
 
 | Range            | Compatible releases                                                          |
@@ -2137,7 +2137,7 @@ export default function contribute(server: PluginServerContext) {
 
 Inputs and outputs are validated on both sides. RPC names start with a lowercase letter and contain lowercase letters, numbers, dots, hyphens, or underscores. `useRpc()` returns a typed async function. Use TanStack Query for request state, caching, and mutations.
 
-Backend handlers receive the same `PaseoApi` as `{ paseo }`. Their connection belongs to the subprocess and closes when the plugin stops. It does not subscribe to timelines or catalog events until plugin code subscribes. Follow the [SDK event contract](../../sdk/events.md) for cleanup and timeline replacements. Backend code can use Node APIs and dependencies installed in the plugin directory.
+Backend handlers receive the same `PaseoApi` as `{ paseo }`. Their connection belongs to the subprocess and closes when the plugin stops. It does not subscribe to timelines or catalog events until plugin code subscribes. Follow the [SDK event contract](../sdk/events.md) for cleanup and timeline replacements. Backend code can use Node APIs and dependencies installed in the plugin directory.
 
 ## Debug backend output
 
