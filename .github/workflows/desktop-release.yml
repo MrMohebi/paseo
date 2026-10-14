@@ -37,6 +37,11 @@ on:
         options:
           - "true"
           - "false"
+      publish_release:
+        description: "Publish the completed draft after desktop builds and manifest assembly."
+        required: false
+        default: true
+        type: boolean
       adhoc_macos:
         description: "Build unnotarized ad-hoc Mac packages without Apple credentials (manual distribution)."
         required: false
@@ -182,6 +187,7 @@ jobs:
           build_args+=("-c.publish.releaseType=$RELEASE_TYPE")
           build_args+=("-c.publish.channel=$RELEASE_CHANNEL")
           if [[ "$ADHOC_MACOS" == "true" ]]; then
+            unset CSC_LINK CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
             export CSC_IDENTITY_AUTO_DISCOVERY=false
             build_args+=(-c.mac.identity=- -c.mac.notarize=false -c.mac.hardenedRuntime=false)
           fi
@@ -220,7 +226,7 @@ jobs:
           retention-days: 7
 
       - name: Upload manifest artifact
-        if: inputs.adhoc_macos != true && env.SHOULD_PUBLISH == 'true' && env.IS_SMOKE_TAG != 'true'
+        if: env.SHOULD_PUBLISH == 'true' && env.IS_SMOKE_TAG != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: mac-manifest-${{ matrix.electron_arch }}
@@ -291,6 +297,33 @@ jobs:
           build_args+=("-c.publish.releaseType=$RELEASE_TYPE")
           build_args+=("-c.publish.channel=$RELEASE_CHANNEL")
           npm run build:desktop "${build_args[@]}"
+
+      - name: Verify Debian 13 amd64 package installation and daemon
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm -i -e EXPECTED_VERSION="$DESKTOP_VERSION" -v "$PWD/$DESKTOP_PACKAGE_PATH/release:/packages:ro" debian:13 bash -s <<'DEBIAN'
+          set -euo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y --no-install-recommends /packages/*-amd64.deb curl ca-certificates
+          test "$(paseo --version)" = "$EXPECTED_VERSION"
+          export PASEO_HOME=/tmp/paseo-debian-smoke PASEO_LISTEN=127.0.0.1:6767
+          export PASEO_RELAY_ENABLED=false PASEO_NOTIFICATIONS_ENABLED=false
+          paseo daemon run >/tmp/paseo-debian.log 2>&1 &
+          daemon_pid=$!
+          trap 'kill "$daemon_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:6767/api/health; then
+              paseo daemon status --json
+              echo "Debian 13 amd64 installation, bundled CLI, and daemon health passed"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/paseo-debian.log
+          exit 1
+          DEBIAN
 
       - name: Upload packaged smoke diagnostics
         if: always()
@@ -428,7 +461,7 @@ jobs:
 
   finalize-rollout:
     needs: [publish-macos, publish-linux, publish-windows]
-    if: ${{ (github.repository == 'getpaseo/paseo' || github.event_name == 'workflow_dispatch') && inputs.adhoc_macos != true && always() && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
+    if: ${{ (github.repository == 'getpaseo/paseo' || github.event_name == 'workflow_dispatch') && always() && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish != 'false') }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -574,4 +607,8 @@ jobs:
           if [[ "$IS_PRERELEASE" == "true" ]]; then
             publish_args+=(--prerelease)
           fi
-          gh "${publish_args[@]}"
+          if [[ "${{ inputs.publish_release }}" != "false" ]]; then
+            gh "${publish_args[@]}"
+          else
+            echo "All desktop manifests uploaded; keeping release draft for remaining assets and validation."
+          fi

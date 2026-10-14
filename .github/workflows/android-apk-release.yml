@@ -12,15 +12,31 @@ on:
         required: true
         type: string
 
+      checkout_ref:
+        description: "Optional source commit/ref to build using tag for release metadata."
+        required: false
+        default: ""
+        type: string
+      build_method:
+        description: "EAS production APK or privately signed source-only APK (no Expo push/QR scanning)."
+        required: false
+        default: "eas"
+        type: choice
+        options:
+          - eas
+          - source
+
 concurrency:
   group: android-apk-release-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
   cancel-in-progress: false
 
 env:
+  CHECKOUT_REF: ${{ github.event_name == 'workflow_dispatch' && (inputs.checkout_ref || inputs.tag) || github.ref }}
   SOURCE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
 jobs:
   ensure-release:
+    if: github.repository == 'getpaseo/paseo' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -28,7 +44,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: scripts
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
+          ref: ${{ env.CHECKOUT_REF }}
 
       - name: Resolve release tag
         shell: bash
@@ -63,6 +79,7 @@ jobs:
           fi
 
   publish-android-apk:
+    if: github.repository == 'getpaseo/paseo' || github.event_name == 'workflow_dispatch'
     needs: [ensure-release]
     permissions:
       contents: write
@@ -73,7 +90,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
+          ref: ${{ env.CHECKOUT_REF }}
 
       - name: Resolve release tag
         shell: bash
@@ -93,12 +110,14 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Expo and EAS
+        if: inputs.build_method != 'source'
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Android APK on EAS
+        if: inputs.build_method != 'source'
         id: eas_build
         shell: bash
         run: |
@@ -118,6 +137,7 @@ jobs:
           echo "build_id=$build_id" >> "$GITHUB_OUTPUT"
 
       - name: Resolve APK artifact URL
+        if: inputs.build_method != 'source'
         id: artifact
         shell: bash
         run: |
@@ -142,9 +162,52 @@ jobs:
           echo "asset_name=$asset_name" >> "$GITHUB_OUTPUT"
           echo "asset_path=$asset_path" >> "$GITHUB_OUTPUT"
 
+      - name: Setup Java for source build
+        if: inputs.build_method == 'source'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Build and sign source-only Android APK
+        if: inputs.build_method == 'source'
+        id: source_apk
+        shell: bash
+        env:
+          APP_VARIANT: production
+          PASEO_FDROID_BUILD: "1"
+          NODE_OPTIONS: --max-old-space-size=4096
+          ANDROID_SIGNING_KEY: ${{ secrets.PASEO_ANDROID_KEYSTORE_BASE64 }}
+          PASEO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.PASEO_ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$ANDROID_SIGNING_KEY" || -z "$PASEO_ANDROID_KEYSTORE_PASSWORD" ]]; then
+            echo "Source APK builds require the fork's private Android signing secrets."
+            exit 1
+          fi
+          umask 077
+          signing_key="$RUNNER_TEMP/paseo-android-release.p12"
+          trap 'rm -f "$signing_key"' EXIT
+          printf '%s' "$ANDROID_SIGNING_KEY" | base64 --decode > "$signing_key"
+          npm run build:app-deps
+          cd packages/app
+          npx expo prebuild --platform android --clean --non-interactive
+          cd android
+          ./gradlew assembleRelease --no-daemon --max-workers=1 -Dorg.gradle.parallel=false
+          unsigned_apk="$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)"
+          test -n "$unsigned_apk"
+          build_tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          asset_path="$RUNNER_TEMP/paseo-${RELEASE_TAG}-android.apk"
+          "$build_tools/apksigner" sign --ks "$signing_key" --ks-type PKCS12 --ks-key-alias paseo             --ks-pass env:PASEO_ANDROID_KEYSTORE_PASSWORD --key-pass env:PASEO_ANDROID_KEYSTORE_PASSWORD             --out "$asset_path" "$unsigned_apk"
+          "$build_tools/apksigner" verify --verbose "$asset_path"
+          "$build_tools/aapt" dump badging "$asset_path" > "$RUNNER_TEMP/apk-badging.txt"
+          sed -n '1p' "$RUNNER_TEMP/apk-badging.txt"
+          echo "asset_path=$asset_path" >> "$GITHUB_OUTPUT"
+
       - name: Upload APK to GitHub Release
         env:
+          APK_ASSET_PATH: ${{ inputs.build_method == 'source' && steps.source_apk.outputs.asset_path || steps.artifact.outputs.asset_path }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           release_lookup="$(node scripts/github-release.mjs --repo "${{ github.repository }}" --tag "$RELEASE_TAG")"
-          gh release upload "$release_lookup" "${{ steps.artifact.outputs.asset_path }}" --clobber --repo "${{ github.repository }}"
+          gh release upload "$release_lookup" "$APK_ASSET_PATH" --clobber --repo "${{ github.repository }}"
