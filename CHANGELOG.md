@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.12.0 - 2026-10-14
+
+Notification fixes and self-hosted ntfy support in the [MrMohebi fork](https://github.com/MrMohebi/paseo). This release includes the upstream development changes already present in the checkout after v0.11.2; see the [full comparison](https://github.com/MrMohebi/paseo/compare/v0.11.2...v0.12.0). Upstream npm packages and mobile store apps are distributed separately.
+
+### Added
+
+- Added optional self-hosted ntfy notifications for agent completion, errors, permission requests, and terminal attention, independently of Expo registration and desktop presence.
+- Added `always_push` and per-device `smart` routing. Use `always_push` to receive Android pushes while working on your Mac, including when Paseo is viewing the same agent.
+- Added configurable event eligibility, ntfy priorities, and notification preview privacy controls. See the [notification setup](https://github.com/MrMohebi/paseo/blob/v0.12.0/docs/notifications.md).
+
+### Fixed
+
+- Fixed mobile push subscriptions disappearing after 48 hours with the app closed. Subscriptions persist across daemon restarts, expire after a configurable 180-day inactivity period, and support token rotation, revocation, and confirmed invalid-token cleanup.
+- Added bounded persistent delivery queues, request timeouts, backoff, Retry-After handling, and Expo receipt checks. Temporary failures in one provider do not block the other.
+- Enabled agent-error notifications by default in the new routing modes and added structured delivery diagnostics without logging credentials or device tokens.
+- Fixed daemon notification requests using outbound HTTP/HTTPS proxies, including NO_PROXY exclusions.
+- Updated fork download links, Docker image references, and desktop update checks to use this repository.
+
+### Distribution
+
+- Mac Apple Silicon DMG and ZIP assets are ad-hoc signed and unnotarized. No Intel Mac, Linux desktop, Windows desktop, or mobile binaries are included in this fork release.
+- Docker images support `linux/amd64` and `linux/arm64`: `ghcr.io/mrmohebi/paseo:0.12.0`.
+- Legacy routing remains the default. Enable `always_push` explicitly for the notification behavior described above. Provider submission and Expo receipts do not prove display on a physical phone.
+
 ## 0.11.2 - 2026-10-09
 
 ### Fixed
