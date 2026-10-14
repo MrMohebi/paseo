@@ -2,7 +2,7 @@
 
 ## 0.12.0 - 2026-10-14
 
-Notification fixes and self-hosted ntfy support in the [MrMohebi fork](https://github.com/MrMohebi/paseo). This release includes the upstream development changes already present in the checkout after v0.11.2; see the [full comparison](https://github.com/MrMohebi/paseo/compare/v0.11.2...v0.12.0). Upstream npm packages and mobile store apps are distributed separately.
+Notification fixes and self-hosted ntfy support in the [MrMohebi fork](https://github.com/MrMohebi/paseo). This release includes the upstream development changes already present in the checkout after v0.11.2; see the [full comparison](https://github.com/MrMohebi/paseo/compare/75953250959979b8f088bbca8dbd6ee61d0151b1...v0.12.0). Upstream npm packages and mobile store apps are distributed separately.
 
 ### Added
 
