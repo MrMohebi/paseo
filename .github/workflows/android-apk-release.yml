@@ -184,7 +184,7 @@ jobs:
         env:
           APP_VARIANT: production
           PASEO_FDROID_BUILD: "1"
-          NODE_OPTIONS: --max-old-space-size=4096
+          NODE_OPTIONS: --max-old-space-size=2048
           ANDROID_SIGNING_KEY: ${{ secrets.PASEO_ANDROID_KEYSTORE_BASE64 }}
           PASEO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.PASEO_ANDROID_KEYSTORE_PASSWORD }}
         run: |
@@ -197,15 +197,32 @@ jobs:
           signing_key="$RUNNER_TEMP/paseo-android-release.p12"
           trap 'rm -f "$signing_key"' EXIT
           printf '%s' "$ANDROID_SIGNING_KEY" | base64 --decode > "$signing_key"
+          # Hosted runners can terminate under memory pressure without a compiler error.
+          sudo fallocate -l 8G /mnt/paseo-build.swap
+          sudo chmod 600 /mnt/paseo-build.swap
+          sudo mkswap /mnt/paseo-build.swap
+          sudo swapon /mnt/paseo-build.swap
+          free -m
           npm run build:app-deps
           cd packages/app
           npx expo prebuild --platform android --clean --non-interactive
           cd android
-          gradle_args=(assembleRelease --no-daemon --max-workers=1 -Dorg.gradle.parallel=false)
+          # Bound Metro workers and release its JVM before compiling native modules.
+          python3 - <<'PYBUILD'
+          from pathlib import Path
+          path = Path("app/build.gradle")
+          source = path.read_text()
+          assert "react {" in source
+          path.write_text(source.replace("react {", 'react {\n    extraPackagerArgs = ["--max-workers", "1"]', 1))
+          PYBUILD
+          gradle_args=(--no-daemon --max-workers=1 -Dorg.gradle.parallel=false)
           if [[ "${{ inputs.android_arch }}" != "all" ]]; then
             gradle_args+=("-PreactNativeArchitectures=${{ inputs.android_arch }}")
           fi
-          ./gradlew "${gradle_args[@]}"
+          ./gradlew "${gradle_args[@]}" '-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=512m' :app:createBundleReleaseJsAndAssets
+          free -m
+          ./gradlew "${gradle_args[@]}" assembleRelease
+          free -m
           unsigned_apk="$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)"
           test -n "$unsigned_apk"
           build_tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
