@@ -8,7 +8,7 @@ The image source lives in [`docker/`](../docker/).
 
 ## How it works
 
-The official image:
+The fork image:
 
 - builds `@getpaseo/server` and `@getpaseo/cli` from source-built workspace tarballs
 - runs the daemon as the non-root `paseo` user
@@ -32,7 +32,7 @@ docker run -d --name paseo \
   -e PASEO_PASSWORD=change-me \
   -v "$PWD/paseo-home:/home/paseo" \
   -v "$PWD:/workspace" \
-  ghcr.io/getpaseo/paseo:latest
+  ghcr.io/mrmohebi/paseo:latest
 ```
 
 Then open:
@@ -59,7 +59,7 @@ Minimal example:
 ```yaml
 services:
   paseo:
-    image: ghcr.io/getpaseo/paseo:latest
+    image: ghcr.io/mrmohebi/paseo:latest
     restart: unless-stopped
     ports:
       - "6767:6767"
@@ -79,7 +79,7 @@ releases to third-party agent release cycles.
 Create a child image for the agents you use:
 
 ```Dockerfile
-FROM ghcr.io/getpaseo/paseo:latest
+FROM ghcr.io/mrmohebi/paseo:latest
 
 USER root
 RUN npm install -g @openai/codex @anthropic-ai/claude-code opencode-ai
@@ -207,9 +207,9 @@ docker build \
 
 The Docker workflow builds the image on pull requests and on `main` as a
 non-publishing check. Stable `vX.Y.Z` tag pushes publish
-`ghcr.io/getpaseo/paseo:X.Y.Z` and `ghcr.io/getpaseo/paseo:latest`. Beta tags
+`ghcr.io/mrmohebi/paseo:X.Y.Z` and `ghcr.io/mrmohebi/paseo:latest`. Beta tags
 publish only the exact prerelease tag, such as
-`ghcr.io/getpaseo/paseo:0.1.102-beta.1`, and do not update `latest`.
+`ghcr.io/mrmohebi/paseo:0.1.102-beta.1`, and do not update `latest`.
 
 To replace a Docker image in place without rebuilding desktop, APK, or EAS
 mobile release artifacts, dispatch the Docker workflow manually instead of

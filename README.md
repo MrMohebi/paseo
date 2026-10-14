@@ -4,6 +4,8 @@
 
 <h1 align="center">Paseo</h1>
 
+This fork by [MrMohebi](https://github.com/MrMohebi) fixes missed agent notifications and adds self-hosted ntfy. Use the [fork releases](https://github.com/MrMohebi/paseo/releases) or Docker image below, then follow the [notification setup](docs/notifications.md). The upstream npm packages and mobile store apps are maintained by [getpaseo/paseo](https://github.com/getpaseo/paseo).
+
 <p align="center">
   <a href="README.md">English</a> ·
   <a href="README.zh-CN.md">简体中文</a> ·
@@ -12,11 +14,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/getpaseo/paseo/stargazers">
-    <img src="https://img.shields.io/github/stars/getpaseo/paseo?style=flat&logo=github" alt="GitHub stars">
+  <a href="https://github.com/MrMohebi/paseo/stargazers">
+    <img src="https://img.shields.io/github/stars/MrMohebi/paseo?style=flat&logo=github" alt="GitHub stars">
   </a>
-  <a href="https://github.com/getpaseo/paseo/releases">
-    <img src="https://img.shields.io/github/v/release/getpaseo/paseo?style=flat&logo=github" alt="GitHub release">
+  <a href="https://github.com/MrMohebi/paseo/releases">
+    <img src="https://img.shields.io/github/v/release/MrMohebi/paseo?style=flat&logo=github" alt="GitHub release">
   </a>
   <a href="https://x.com/moboudra">
     <img src="https://img.shields.io/badge/%40moboudra-555?logo=x" alt="X">
@@ -85,13 +87,13 @@ You need at least one agent CLI installed and configured with your credentials:
 
 ### Desktop app (recommended)
 
-Download it from [paseo.sh/download](https://paseo.sh/download) or the [GitHub releases page](https://github.com/getpaseo/paseo/releases). Open the app and the daemon starts automatically. Nothing else to install.
+Download the Mac Apple Silicon build from the [fork releases page](https://github.com/MrMohebi/paseo/releases). It bundles the fixed daemon and starts it automatically. Fork Mac builds are ad-hoc signed and unnotarized; see the release notes for installation limitations. Other platforms remain available from [upstream](https://paseo.sh/download).
 
 To connect from your phone, open **Settings → your host → Pair Device**.
 
 ### Server
 
-For a server, a VM, or any machine without the desktop app. Install the CLI and start the daemon:
+For the notification fixes on a headless machine, use the Docker image below or [build this checkout](docs/development.md). The following npm command installs the upstream CLI, which does not include this fork’s notification changes:
 
 ```bash
 npm install -g @getpaseo/cli
@@ -104,6 +106,7 @@ For full setup and configuration, see:
 
 - [Docs](https://paseo.sh/docs)
 - [Connectivity guide](https://paseo.sh/docs/connectivity)
+- [Notification configuration](docs/notifications.md)
 - [Configuration reference](https://paseo.sh/docs/configuration)
 
 ### Docker
@@ -116,7 +119,7 @@ docker run -d --name paseo \
   -e PASEO_PASSWORD=change-me \
   -v "$PWD/paseo-home:/home/paseo" \
   -v "$PWD:/workspace" \
-  ghcr.io/getpaseo/paseo:latest
+  ghcr.io/mrmohebi/paseo:latest
 ```
 
 Open `http://localhost:6767` after it starts. Extend the base image with the agent CLIs you use, then provide credentials through environment variables or the persistent `/home/paseo` volume. See the [Docker documentation](docs/docker.md) for full setup details.
@@ -168,7 +171,7 @@ See the [SDK quickstart](https://paseo.sh/docs/sdk/quickstart), [recipes](https:
 Skills teach your agent to use Paseo to orchestrate other agents.
 
 ```bash
-npx skills add getpaseo/paseo
+npx skills add MrMohebi/paseo
 ```
 
 Then use them in any agent conversation:

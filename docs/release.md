@@ -2,6 +2,14 @@
 
 All workspaces share one version and release together.
 
+## Fork distribution
+
+`MrMohebi/paseo` distributes notification fixes through GitHub releases and `ghcr.io/mrmohebi/paseo`. Its release version is independent of upstream. Do not publish fork packages under the upstream `@getpaseo` npm scope.
+
+Fork releases currently include Mac Apple Silicon DMG/ZIP assets and multi-architecture Docker images. Mac builds are ad-hoc signed and unnotarized. Keep upstream deployment, signed desktop-release, and Android-release workflows disabled in the fork until you provision your own signing and deployment credentials. CI, Docker, and Release Notes Sync remain enabled.
+
+Prepare matching workspace versions with `npm version <version> --no-git-tag-version --ignore-scripts`, `npm run version:sync-internal`, `npm run fdroid:changelogs`, and `npm install --package-lock-only --ignore-scripts`. Commit the changelog and version separately from implementation changes. Build and smoke the exact release commit, upload DMG/ZIP and SHA256 checksums to a draft GitHub release, confirm the Docker publish succeeded, then publish the draft. The full upstream store/npm checklist below applies to upstream releases.
+
 ## Two steps
 
 A release has exactly two steps. The agent does the first, the user authorizes the second.

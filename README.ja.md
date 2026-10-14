@@ -4,6 +4,8 @@
 
 <h1 align="center">Paseo</h1>
 
+This fork by [MrMohebi](https://github.com/MrMohebi) fixes missed agent notifications and adds self-hosted ntfy. Use the [fork releases](https://github.com/MrMohebi/paseo/releases) or Docker image below, then follow the [notification setup](docs/notifications.md). The upstream npm packages and mobile store apps are maintained by [getpaseo/paseo](https://github.com/getpaseo/paseo).
+
 <p align="center">
   <a href="README.md">English</a> ·
   <a href="README.zh-CN.md">简体中文</a> ·
@@ -12,11 +14,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/getpaseo/paseo/stargazers">
-    <img src="https://img.shields.io/github/stars/getpaseo/paseo?style=flat&logo=github" alt="GitHub stars">
+  <a href="https://github.com/MrMohebi/paseo/stargazers">
+    <img src="https://img.shields.io/github/stars/MrMohebi/paseo?style=flat&logo=github" alt="GitHub stars">
   </a>
-  <a href="https://github.com/getpaseo/paseo/releases">
-    <img src="https://img.shields.io/github/v/release/getpaseo/paseo?style=flat&logo=github" alt="GitHub release">
+  <a href="https://github.com/MrMohebi/paseo/releases">
+    <img src="https://img.shields.io/github/v/release/MrMohebi/paseo?style=flat&logo=github" alt="GitHub release">
   </a>
   <a href="https://x.com/moboudra">
     <img src="https://img.shields.io/badge/%40moboudra-555?logo=x" alt="X">
@@ -69,7 +71,7 @@ Paseo はコーディングエージェントを管理するローカルサー�
 
 ### デスクトップアプリ（推奨）
 
-[paseo.sh/download](https://paseo.sh/download) または [GitHub のリリースページ](https://github.com/getpaseo/paseo/releases)からダウンロードしてください。アプリを開くとデーモンが自動的に起動します。追加のインストールは不要です。
+Mac Apple Silicon 版は[このフォークのリリースページ](https://github.com/MrMohebi/paseo/releases)からダウンロードしてください。アドホック署名で、Apple の公証はありません。他のプラットフォームは[上流のダウンロード](https://paseo.sh/download)を利用してください。
 
 スマートフォンから接続するには、Settings 画面に表示される QR コードをスキャンしてください。
 
