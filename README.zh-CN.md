@@ -71,7 +71,7 @@ Paseo 会运行一个名为 daemon 的本地服务，用来管理你的 coding a
 
 ### 桌面 app（推荐）
 
-从 [本分支的 GitHub releases 页面](https://github.com/MrMohebi/paseo/releases)下载 Mac Apple Silicon 版本。此版本采用临时签名，未经 Apple 公证。其他平台请使用[上游下载](https://paseo.sh/download)。
+从 [本分支的 GitHub releases 页面](https://github.com/MrMohebi/paseo/releases)下载 Mac、Linux、Windows 和 Android 版本。Mac 版本采用临时签名，未经 Apple 公证。Android APK 的通知需要单独安装 ntfy 应用。
 
 如果要从手机连接，在 Settings 中扫描显示的二维码。
 

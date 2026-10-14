@@ -160,7 +160,7 @@ The EAS `production-apk` profile uses the large Android resource class. Release 
 
 ### Fork GitHub APK
 
-The fork's Android APK Release workflow supports `build_method=source` and an explicit `checkout_ref`. It builds the source-only profile above and signs the APK with the fork's private PKCS12 key. Keep `PASEO_ANDROID_KEYSTORE_BASE64` and `PASEO_ANDROID_KEYSTORE_PASSWORD` in encrypted GitHub Actions secrets; retain an owner-only backup of the key for future upgrades. Never commit the key or its password.
+The fork's Android APK Release workflow supports `build_method=source` and an explicit `checkout_ref`. Use a full 40-character commit SHA for `checkout_ref`. The v0.12.0 release APK targets ARM64 Android phones (`android_arch=arm64-v8a`); select `all` for an all-ABI build on a sufficiently sized runner. It builds the source-only profile above and signs the APK with the fork's private PKCS12 key. Keep `PASEO_ANDROID_KEYSTORE_BASE64` and `PASEO_ANDROID_KEYSTORE_PASSWORD` in encrypted GitHub Actions secrets; retain an owner-only backup of the key for future upgrades. Never commit the key or its password.
 
 This APK uses the separate ntfy Android app for notifications. Native Expo push and QR scanning are excluded. You can keep using the upstream mobile store app with the fork daemon when you need those features. The fork and upstream signing keys differ, so Android rejects installing this APK over an upstream installation. Back up pairing details before replacing an installed app.
 
