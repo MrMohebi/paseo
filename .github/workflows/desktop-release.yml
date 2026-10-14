@@ -307,15 +307,17 @@ jobs:
           export DEBIAN_FRONTEND=noninteractive
           apt-get update -qq
           apt-get install -y --no-install-recommends /packages/*-amd64.deb curl ca-certificates
-          test "$(paseo --version)" = "$EXPECTED_VERSION"
+          # The desktop installs its CLI symlink on first launch; check the bundled shim directly.
+          PASEO_CLI=/opt/Paseo/resources/bin/paseo
+          test "$("$PASEO_CLI" --version)" = "$EXPECTED_VERSION"
           export PASEO_HOME=/tmp/paseo-debian-smoke PASEO_LISTEN=127.0.0.1:6767
           export PASEO_RELAY_ENABLED=false PASEO_NOTIFICATIONS_ENABLED=false
-          paseo daemon run >/tmp/paseo-debian.log 2>&1 &
+          "$PASEO_CLI" daemon run >/tmp/paseo-debian.log 2>&1 &
           daemon_pid=$!
           trap 'kill "$daemon_pid" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:6767/api/health; then
-              paseo daemon status --json
+              "$PASEO_CLI" daemon status --json
               echo "Debian 13 amd64 installation, bundled CLI, and daemon health passed"
               exit 0
             fi
