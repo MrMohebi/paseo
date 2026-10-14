@@ -73,6 +73,19 @@ linux:
     - rpm
     - tar.gz
 deb:
+  # Preserve builder defaults and include the libraries Electron loads on a minimal Debian install.
+  depends:
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libuuid1
+    - libsecret-1-0
+    - libgbm1
+    - libasound2
   afterInstall: scripts/linux-sandbox/after-install.tpl
 rpm:
   afterInstall: scripts/linux-sandbox/after-install.tpl

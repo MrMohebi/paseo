@@ -1,4 +1,16 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import type { DaemonClient } from "@getpaseo/client/internal/daemon-client";
+
+vi.mock("expo-notifications", async () => await import("../../fdroid/expo-notifications"));
+vi.mock("expo-constants", () => ({ default: {} }));
+vi.mock("react-native", () => ({ Platform: { OS: "android" } }));
+vi.mock("@react-native-async-storage/async-storage", () => ({
+  default: {
+    getItem: async () => null,
+    removeItem: vi.fn(async () => {}),
+    setItem: async () => {},
+  },
+}));
 import { registerRotatedPushToken } from "./token-registration";
 
 describe("push token rotation", () => {
@@ -72,5 +84,28 @@ describe("push token rotation", () => {
       supportsRevocation: true,
     });
     expect(revoked).toEqual(["old"]);
+  });
+
+  it("starts and closes a source-only subscription without native notification APIs or Expo registration", async () => {
+    const { startSubscription } = await import("./subscriptions");
+    const storage = (await import("@react-native-async-storage/async-storage")).default;
+    const unsubscribe = vi.fn();
+    const client = {
+      isConnected: true,
+      registerPushToken: vi.fn(),
+      unregisterPushToken: vi.fn(),
+      getLastServerInfoMessage: () => null,
+      subscribeConnectionStatus: () => unsubscribe,
+    };
+    const stop = startSubscription({
+      client: client as unknown as DaemonClient,
+      serverId: "source-only",
+    });
+    await vi.waitFor(() =>
+      expect(storage.removeItem).toHaveBeenCalledWith("@paseo:expo-push-token:source-only"),
+    );
+    expect(client.registerPushToken).not.toHaveBeenCalled();
+    stop();
+    expect(unsubscribe).toHaveBeenCalledOnce();
   });
 });

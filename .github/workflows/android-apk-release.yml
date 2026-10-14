@@ -17,6 +17,14 @@ on:
         required: false
         default: ""
         type: string
+      android_arch:
+        description: "Source APK architectures. ARM64 fits modern Android phones and keeps source builds bounded."
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - arm64-v8a
       build_method:
         description: "EAS production APK or privately signed source-only APK (no Expo push/QR scanning)."
         required: false
@@ -193,7 +201,11 @@ jobs:
           cd packages/app
           npx expo prebuild --platform android --clean --non-interactive
           cd android
-          ./gradlew assembleRelease --no-daemon --max-workers=1 -Dorg.gradle.parallel=false
+          gradle_args=(assembleRelease --no-daemon --max-workers=1 -Dorg.gradle.parallel=false)
+          if [[ "${{ inputs.android_arch }}" != "all" ]]; then
+            gradle_args+=("-PreactNativeArchitectures=${{ inputs.android_arch }}")
+          fi
+          ./gradlew "${gradle_args[@]}"
           unsigned_apk="$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)"
           test -n "$unsigned_apk"
           build_tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
