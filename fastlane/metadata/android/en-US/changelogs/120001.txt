@@ -1,0 +1,3 @@
+Notification fixes and self-hosted ntfy support in the MrMohebi fork. This release includes the upstream development changes already present in the checkout after v0.11.2; see the full comparison. Upstream npm packages and mobile store apps are distributed separately.
+
+Full notes: https://github.com/MrMohebi/paseo/releases
