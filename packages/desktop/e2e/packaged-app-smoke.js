@@ -945,6 +945,18 @@ async function smokePackagedDesktopApp({
       deadline,
     });
     console.log("Packaged desktop smoke: renderer-started desktop daemon reported running");
+    const expectedBuildLabel = process.env.PASEO_EXPECTED_BUILD_LABEL;
+    if (expectedBuildLabel) {
+      const label = page.getByTestId("dev-build-label");
+      await label.waitFor({ state: "visible", timeout: 10_000 });
+      assert.equal(await label.textContent(), expectedBuildLabel);
+      const artifactDir = process.env.PASEO_DESKTOP_SMOKE_ARTIFACT_DIR;
+      if (artifactDir) {
+        fs.mkdirSync(artifactDir, { recursive: true });
+        await page.screenshot({ path: path.join(artifactDir, "packaged-build-label.png") });
+      }
+      console.log(`Packaged desktop smoke: build label ${expectedBuildLabel} is visible`);
+    }
     await assertBuiltinPluginsStarted(listen);
     console.log("Packaged desktop smoke: every built-in plugin started");
     await smokeCliShim({ appPath, env });

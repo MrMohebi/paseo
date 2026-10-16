@@ -179,13 +179,18 @@ export function isVersionMismatch(
   return app !== daemon;
 }
 
-export function formatVersionWithPrefix(version: string | null | undefined): string {
+export function formatVersionWithPrefix(
+  version: string | null | undefined,
+  buildLabel?: string | null,
+): string {
   const value = version?.trim();
   if (!value) {
     return "\u2014";
   }
 
-  return value.startsWith("v") ? value : `v${value}`;
+  const displayVersion = value.startsWith("v") ? value : `v${value}`;
+  const label = buildLabel?.trim();
+  return label ? `${displayVersion} (${label})` : displayVersion;
 }
 
 export function buildMacAppleSiliconDownloadUrl(version: string | null | undefined): string | null {

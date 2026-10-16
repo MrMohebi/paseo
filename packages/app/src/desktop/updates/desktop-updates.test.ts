@@ -35,6 +35,9 @@ describe("desktop-updates helpers", () => {
     expect(formatVersionWithPrefix("0.2.0")).toBe("v0.2.0");
     expect(formatVersionWithPrefix("v0.2.0")).toBe("v0.2.0");
     expect(formatVersionWithPrefix(null)).toBe("\u2014");
+    expect(formatVersionWithPrefix("0.12.1", " MrMohebi/main ")).toBe("v0.12.1 (MrMohebi/main)");
+    expect(formatVersionWithPrefix("v0.12.1", " ")).toBe("v0.12.1");
+    expect(formatVersionWithPrefix(null, "MrMohebi/main")).toBe("\u2014");
   });
 
   it("parses valid local daemon version result", async () => {

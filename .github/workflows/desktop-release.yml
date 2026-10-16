@@ -22,6 +22,7 @@ on:
         options:
           - all
           - macos
+          - macos-debian
           - linux
           - windows
       checkout_ref:
@@ -75,7 +76,7 @@ env:
 
 jobs:
   create-release:
-    if: ${{ (github.repository == 'getpaseo/paseo' || github.event_name == 'workflow_dispatch') && ((github.event_name == 'push' && !startsWith(github.ref_name, 'desktop-macos-v') && !startsWith(github.ref_name, 'desktop-linux-v') && !startsWith(github.ref_name, 'desktop-windows-v')) || (github.event_name == 'workflow_dispatch' && github.event.inputs.platform == 'all' && github.event.inputs.publish != 'false')) }}
+    if: ${{ (github.repository == 'getpaseo/paseo' || github.event_name == 'workflow_dispatch') && ((github.event_name == 'push' && !startsWith(github.ref_name, 'desktop-macos-v') && !startsWith(github.ref_name, 'desktop-linux-v') && !startsWith(github.ref_name, 'desktop-windows-v')) || (github.event_name == 'workflow_dispatch' && (github.event.inputs.platform == 'all' || github.event.inputs.platform == 'macos-debian') && github.event.inputs.publish != 'false')) }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -114,7 +115,7 @@ jobs:
 
   publish-macos:
     needs: [create-release]
-    if: ${{ (github.repository == 'getpaseo/paseo' || github.event_name == 'workflow_dispatch') && always() && (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') && ((github.event_name == 'workflow_dispatch' && (github.event.inputs.platform == 'all' || github.event.inputs.platform == 'macos')) || (github.event_name == 'push' && (startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'desktop-v') || startsWith(github.ref_name, 'desktop-macos-v')))) }}
+    if: ${{ (github.repository == 'getpaseo/paseo' || github.event_name == 'workflow_dispatch') && always() && (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') && ((github.event_name == 'workflow_dispatch' && (github.event.inputs.platform == 'all' || github.event.inputs.platform == 'macos-debian' || github.event.inputs.platform == 'macos')) || (github.event_name == 'push' && (startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'desktop-v') || startsWith(github.ref_name, 'desktop-macos-v')))) }}
     strategy:
       fail-fast: false
       matrix:
@@ -168,6 +169,8 @@ jobs:
         shell: bash
         env:
           ADHOC_MACOS: ${{ inputs.adhoc_macos }}
+          EXPO_PUBLIC_PASEO_BUILD_LABEL: ${{ github.repository == 'MrMohebi/paseo' && 'MrMohebi/main' || '' }}
+          PASEO_EXPECTED_BUILD_LABEL: ${{ github.repository == 'MrMohebi/paseo' && 'MrMohebi/main' || '' }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EP_GH_IGNORE_TIME: true
           CSC_LINK: ${{ secrets.APPLE_CERTIFICATE }}
@@ -198,7 +201,7 @@ jobs:
           fi
 
       - name: Upload packaged smoke diagnostics
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: desktop-smoke-macos-${{ matrix.electron_arch }}
@@ -235,7 +238,7 @@ jobs:
 
   publish-linux:
     needs: [create-release]
-    if: ${{ (github.repository == 'getpaseo/paseo' || github.event_name == 'workflow_dispatch') && always() && (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') && ((github.event_name == 'workflow_dispatch' && (github.event.inputs.platform == 'all' || github.event.inputs.platform == 'linux')) || (github.event_name == 'push' && (startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'desktop-v') || startsWith(github.ref_name, 'desktop-linux-v')))) }}
+    if: ${{ (github.repository == 'getpaseo/paseo' || github.event_name == 'workflow_dispatch') && always() && (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') && ((github.event_name == 'workflow_dispatch' && (github.event.inputs.platform == 'all' || github.event.inputs.platform == 'macos-debian' || github.event.inputs.platform == 'linux')) || (github.event_name == 'push' && (startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'desktop-v') || startsWith(github.ref_name, 'desktop-linux-v')))) }}
     permissions:
       contents: write
       packages: read
@@ -294,6 +297,9 @@ jobs:
         run: |
           set -euo pipefail
           build_args=(-- --publish never --linux --x64)
+          if [[ "${{ inputs.platform }}" == "macos-debian" ]]; then
+            build_args=(-- --publish never --linux deb --x64)
+          fi
           build_args+=("-c.publish.releaseType=$RELEASE_TYPE")
           build_args+=("-c.publish.channel=$RELEASE_CHANNEL")
           npm run build:desktop "${build_args[@]}"
@@ -356,7 +362,7 @@ jobs:
           retention-days: 7
 
       - name: Upload manifest artifact
-        if: env.SHOULD_PUBLISH == 'true' && env.IS_SMOKE_TAG != 'true'
+        if: env.SHOULD_PUBLISH == 'true' && env.IS_SMOKE_TAG != 'true' && inputs.platform != 'macos-debian'
         uses: actions/upload-artifact@v4
         with:
           name: linux-manifest
@@ -506,7 +512,7 @@ jobs:
           path: release-manifests
 
       - name: Download Linux manifest artifact
-        if: env.IS_SMOKE_TAG != 'true' && needs.publish-linux.result == 'success'
+        if: env.IS_SMOKE_TAG != 'true' && needs.publish-linux.result == 'success' && inputs.platform != 'macos-debian'
         uses: actions/download-artifact@v4
         with:
           name: linux-manifest
@@ -535,6 +541,9 @@ jobs:
             "${RELEASE_CHANNEL}-linux.yml"
             "${RELEASE_CHANNEL}.yml"
           )
+          if [[ "${{ inputs.platform }}" == "macos-debian" ]]; then
+            expected_manifests=("${RELEASE_CHANNEL}-mac.yml")
+          fi
           release_lookup="$(node ../scripts/github-release.mjs --repo "${{ github.repository }}" --tag "$RELEASE_TAG" --cleanup-duplicates)"
           existing_assets="$(gh release view "$release_lookup" --repo "${{ github.repository }}" --json assets --jq '.assets[].name')"
           for manifest_name in "${expected_manifests[@]}"; do
@@ -565,7 +574,7 @@ jobs:
               "$manifests_dir/${manifest_name}"
           fi
 
-          if [[ "${{ needs.publish-linux.result }}" == "success" ]]; then
+          if [[ "${{ needs.publish-linux.result }}" == "success" && "${{ inputs.platform }}" != "macos-debian" ]]; then
             cp "linux-manifest/${RELEASE_CHANNEL}-linux.yml" "$manifests_dir/"
           fi
 

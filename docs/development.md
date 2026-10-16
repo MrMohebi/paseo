@@ -25,7 +25,7 @@ desktop launches always force the daemon to production mode.
 
 The web and desktop dev launchers pass the current Git branch to Metro as
 `EXPO_PUBLIC_PASEO_DEV_BUILD_LABEL`. The expanded desktop sidebar shows it in
-the titlebar row. Production builds leave the variable unset and show no label.
+the titlebar row. Production builds can set `EXPO_PUBLIC_PASEO_BUILD_LABEL` to show a distribution label in the sidebar and Settings app version. The fork Mac release sets it to `MrMohebi/main`. This is display metadata; version comparisons keep using the numeric package version.
 
 `npm run dev` is only a shorthand for `npm run dev:server`. Keep `127.0.0.1:6767` for the packaged app and production-style `~/.paseo` state.
 
