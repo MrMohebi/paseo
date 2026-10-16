@@ -1,0 +1,5 @@
+Changed
+- Synced the notification fork with upstream main through 5acfbb377, including chat rendering and history improvements, keyboard fixes, local audio transcription fixes, worktree terminal setup, and the Hoplite provider catalog.
+- Mac builds show MrMohebi/main in the sidebar and beside the app version in Settings. Version comparisons use the numeric version.
+
+Full notes: https://github.com/MrMohebi/paseo/releases
