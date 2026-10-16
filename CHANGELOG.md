@@ -25,6 +25,29 @@ Notification fixes and self-hosted ntfy support in the [MrMohebi fork](https://g
 - Docker images support `linux/amd64` and `linux/arm64`: `ghcr.io/mrmohebi/paseo:0.12.0`.
 - Legacy routing remains the default. Enable `always_push` explicitly for the notification behavior described above. Provider submission and Expo receipts do not prove display on a physical phone.
 
+## 0.11.4 - 2026-10-15
+
+[Hoplite](https://hoplite.sh) joins Paseo as our first sponsor through the company sponsorship program. Hoplite builds cloud coding agents that turn tasks from GitHub, Linear, Slack and more into pull requests. Thank you to the Hoplite team for supporting Paseo.
+
+### Fixed
+
+- Fixed Hoplite showing an error in Settings → Providers instead of discovering models in workspaces linked to a Hoplite project
+
+## 0.11.3 - 2026-10-15
+
+### Added
+
+- Added Hoplite as an opt-in provider in the ACP provider catalog ([#6953](https://github.com/getpaseo/paseo/pull/6953) by [@odinglyn0](https://github.com/odinglyn0))
+- Added search to the Add provider catalog ([#6953](https://github.com/getpaseo/paseo/pull/6953), [#7030](https://github.com/getpaseo/paseo/pull/7030))
+
+### Changed
+
+- Changed Add provider failures to show as a toast ([#7030](https://github.com/getpaseo/paseo/pull/7030))
+
+### Fixed
+
+- Fixed Remove being offered for plugin providers such as Antigravity and Muse Code ([#6568](https://github.com/getpaseo/paseo/pull/6568) by [@Ctrl-Creeper](https://github.com/Ctrl-Creeper))
+
 ## 0.11.2 - 2026-10-09
 
 ### Fixed
