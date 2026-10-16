@@ -568,9 +568,16 @@ jobs:
 
           if [[ "${{ needs.publish-macos.result }}" == "success" ]]; then
             manifest_name="${RELEASE_CHANNEL}-mac.yml"
+            shopt -s nullglob
+            mac_manifests=(mac-manifest-*/"${manifest_name}")
+            if (( ${#mac_manifests[@]} == 0 || ${#mac_manifests[@]} > 2 )); then
+              echo "::error::Expected one or two Mac architecture manifests"
+              exit 1
+            fi
+            # A single architecture still needs the minimum macOS version guard.
             node ../scripts/merge-mac-manifest.mjs \
-              "mac-manifest-arm64/${manifest_name}" \
-              "mac-manifest-x64/${manifest_name}" \
+              "${mac_manifests[0]}" \
+              "${mac_manifests[${#mac_manifests[@]}-1]}" \
               "$manifests_dir/${manifest_name}"
           fi
 

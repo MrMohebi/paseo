@@ -6,7 +6,7 @@
 
 - Synced the notification fork with upstream main through [5acfbb377](https://github.com/getpaseo/paseo/commit/5acfbb3777d7fbac634f4ed83aefed56fb49cb8f), including chat rendering and history improvements, keyboard fixes, local audio transcription fixes, worktree terminal setup, and the Hoplite provider catalog.
 - Mac builds show `MrMohebi/main` in the sidebar and beside the app version in Settings. Version comparisons use the numeric version.
-- This update distributes only Mac ARM/Intel DMG/ZIP packages and a Debian 13 amd64 DEB. Mac builds remain ad-hoc signed and unnotarized.
+- This update distributes only Mac Apple Silicon (ARM64) DMG/ZIP packages and a Debian 13 amd64 DEB. Mac builds remain ad-hoc signed and unnotarized.
 - Preserved the fork's ntfy provider, notification routing, persistent Expo subscriptions, delivery retries, custom relay configuration, and private notification settings.
 
 ## 0.12.0 - 2026-10-14
