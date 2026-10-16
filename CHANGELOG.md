@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.12.2 - 2026-10-16
+
+### Added
+
+- Set a custom **New branch name** when creating a worktree in the app. Leave it blank for automatic naming; the selected starting branch remains the base.
+
+### Fixed
+
+- Preserve explicitly chosen branch names when the first agent starts instead of replacing them with a generated name.
+- Allow correcting a rejected branch name and retrying workspace creation in the same draft.
+
 ## 0.12.1 - 2026-10-16
 
 ### Changed
