@@ -1356,6 +1356,8 @@ export const fr: TranslationResources = {
       label: "Isolation",
     },
     fields: {
+      newBranchName: "Nom de la nouvelle branche",
+      automaticBranchName: "Automatique",
       project: "Projet",
       base: "Base",
       baseNotApplicable: "Non applicable",

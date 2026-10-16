@@ -122,6 +122,7 @@ import {
 } from "./new-workspace-initial-context";
 import { buildNewWorkspaceProjectIconTargets } from "./new-workspace/project-icon-targets";
 import { useNewWorkspaceProjectPicker } from "./new-workspace/project-picker";
+import { NewBranchField } from "./new-workspace/new-branch-field";
 import { ImportSessionButton } from "./new-workspace/import-session-button";
 import { useImportSession } from "@/hooks/use-import-session";
 import {
@@ -1665,6 +1666,11 @@ export function NewWorkspaceScreen({
   // COMPAT(workspaceMultiplicity): added in v0.1.97, drop the gate when floor >= v0.1.97
   const supportsWorkspaceMultiplicity = useHostFeature(selectedServerId, "workspaceMultiplicity");
   const supportsForgeSearch = useHostFeature(selectedServerId, "forgeSearch");
+  const [newBranch, setNewBranch] = useState(() => ({ name: "", requestId: generateDraftId() }));
+  const handleNewBranchNameChange = useCallback((name: string) => {
+    // Editing after a rejected name is a new request; retries of the same edit keep their key.
+    setNewBranch({ name, requestId: generateDraftId() });
+  }, []);
   const [creationIdentity] = useState(() => ({
     draftId: draftId ?? generateDraftId(),
     worktreeSlug: createNameId(),
@@ -2068,10 +2074,11 @@ export function NewWorkspaceScreen({
       const checkoutRequest = checkoutStatusForCreate
         ? pickerItemToCheckoutRequest(
             selectedItem ?? defaultBasePickerItem(checkoutStatusForCreate),
+            newBranch.name,
           )
         : undefined;
       const normalizedWorkspace = await createMultiplicityWorkspace({
-        idempotencyKey: creationIdentity.draftId,
+        idempotencyKey: `${creationIdentity.draftId}:${newBranch.requestId}`,
         worktreeSlug: creationIdentity.worktreeSlug,
         client: connectedClient,
         isolation: createsWorktree ? "worktree" : "local",
@@ -2093,6 +2100,7 @@ export function NewWorkspaceScreen({
     [
       creationIdentity,
       creationResult,
+      newBranch,
       effectiveIsolation,
       mergeWorkspaces,
       queryClient,
@@ -2443,11 +2451,27 @@ export function NewWorkspaceScreen({
         isCompact={isCompact}
         fullscreen={isComposerFullscreen}
         title={t("newWorkspace.title")}
-        formStack={formStack}
+        formStack={
+          <>
+            {formStack}
+            <NewBranchField
+              showRefPicker={showRefPicker}
+              worktreeSupport={worktreeSupport}
+              baseItem={baseItem}
+              pending={isPending}
+              value={newBranch.name}
+              onChange={handleNewBranchNameChange}
+            />
+          </>
+        }
         onImportSession={importSession.open}
       >
         {composer}
-        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+        {errorMessage ? (
+          <Text testID="new-workspace-create-error" style={styles.errorText}>
+            {errorMessage}
+          </Text>
+        ) : null}
       </NewWorkspaceLayout>
       {importSession.sheet}
     </FileDropZone>

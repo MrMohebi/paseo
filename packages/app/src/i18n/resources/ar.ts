@@ -1328,6 +1328,8 @@ export const ar: TranslationResources = {
       label: "العزل",
     },
     fields: {
+      newBranchName: "اسم الفرع الجديد",
+      automaticBranchName: "تلقائي",
       project: "المشروع",
       base: "الأساس",
       baseNotApplicable: "غير قابل للتطبيق",

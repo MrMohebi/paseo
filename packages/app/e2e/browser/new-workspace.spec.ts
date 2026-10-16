@@ -695,6 +695,87 @@ test.describe("New workspace flow", () => {
     }
   });
 
+  test("custom branch name creates the requested branch and follows worktree isolation", async ({
+    page,
+  }) => {
+    const serverId = getServerId();
+    const tempRepo = await createTempGitRepo("new-workspace-custom-branch-", {
+      branches: ["main", "dev"],
+    });
+    try {
+      const openedProject = await openProjectViaDaemon(client, tempRepo.path);
+      localWorkspaceIds.add(openedProject.workspaceId);
+      await gotoAppShell(page);
+      await waitForSidebarHydration(page);
+      await openNewWorkspaceComposer(page, {
+        projectKey: openedProject.projectKey,
+        projectDisplayName: openedProject.projectDisplayName,
+      });
+      await selectWorkspaceIsolation(page, "worktree");
+      const branchName = page.getByTestId("new-workspace-branch-name");
+      await expect(branchName).toBeVisible();
+      await branchName.fill("feature/my-custom-task");
+      await selectWorkspaceIsolation(page, "local");
+      await expect(branchName).toBeHidden();
+      await selectWorkspaceIsolation(page, "worktree");
+      await expect(branchName).toHaveValue("feature/my-custom-task");
+      await openStartingRefPicker(page);
+      await selectBranchInPicker(page, "dev");
+      await page.screenshot({ path: test.info().outputPath("custom-branch-name.png") });
+      await submitNewWorkspaceEmpty(page);
+      const createdWorkspace = await assertNewWorkspaceSidebarAndHeader(page, {
+        serverId,
+        client,
+        previousWorkspaceId: openedProject.workspaceId,
+        projectDisplayName: openedProject.projectDisplayName,
+      });
+      createdWorktreeDirectories.add(createdWorkspace.workspaceDirectory);
+      const branchInfo = await readWorktreeBranchInfo({
+        worktreePath: createdWorkspace.workspaceDirectory,
+      });
+      expect(branchInfo.currentBranch).toBe("feature/my-custom-task");
+      expect(branchInfo.hasAncestor(tempRepo.branchHeads.dev)).toBe(true);
+    } finally {
+      await tempRepo.cleanup();
+    }
+  });
+
+  test("custom branch name errors stay visible and preserve the input", async ({ page }) => {
+    const tempRepo = await createTempGitRepo("new-workspace-invalid-branch-");
+    try {
+      const openedProject = await openProjectViaDaemon(client, tempRepo.path);
+      localWorkspaceIds.add(openedProject.workspaceId);
+      await gotoAppShell(page);
+      await waitForSidebarHydration(page);
+      await openNewWorkspaceComposer(page, {
+        projectKey: openedProject.projectKey,
+        projectDisplayName: openedProject.projectDisplayName,
+      });
+      await selectWorkspaceIsolation(page, "worktree");
+      const branchName = page.getByTestId("new-workspace-branch-name");
+      await branchName.fill("invalid..branch");
+      await submitNewWorkspaceEmpty(page);
+      await expect(page.getByTestId("new-workspace-create-error")).toBeVisible({ timeout: 30_000 });
+      await expect(branchName).toHaveValue("invalid..branch");
+      await expect(branchName).toBeEditable();
+      await branchName.fill("fix/corrected-branch");
+      await submitNewWorkspaceEmpty(page);
+      const createdWorkspace = await assertNewWorkspaceSidebarAndHeader(page, {
+        serverId: getServerId(),
+        client,
+        previousWorkspaceId: openedProject.workspaceId,
+        projectDisplayName: openedProject.projectDisplayName,
+      });
+      createdWorktreeDirectories.add(createdWorkspace.workspaceDirectory);
+      const branchInfo = await readWorktreeBranchInfo({
+        worktreePath: createdWorkspace.workspaceDirectory,
+      });
+      expect(branchInfo.currentBranch).toBe("fix/corrected-branch");
+    } finally {
+      await tempRepo.cleanup();
+    }
+  });
+
   test("selected branch becomes the base of a new workspace worktree", async ({ page }) => {
     const serverId = getServerId();
 
