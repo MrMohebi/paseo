@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.12.3 - 2026-10-19
+
+Synced the fork with upstream main through [91154ba4](https://github.com/getpaseo/paseo/commit/91154ba4e8ace3484595a05a4366279fb4818745), bringing in 102 upstream commits since v0.12.2. Fork versions remain independent of upstream release numbers.
+
+### Added
+
+- Plugins can use inline SVG and component icons ([#7368](https://github.com/getpaseo/paseo/pull/7368)).
+- Subagent rows show the model and effort beneath the title ([#7290](https://github.com/getpaseo/paseo/pull/7290)).
+- Run, stop, and restart workspace scripts from the compact header menu ([#7122](https://github.com/getpaseo/paseo/pull/7122)).
+
+### Improved
+
+- Markdown uses one renderer across platforms, with native selection across paragraphs, reflow on resize, and consistent code, image, and link presentation ([#6973](https://github.com/getpaseo/paseo/pull/6973), [#7298](https://github.com/getpaseo/paseo/pull/7298)).
+- Command Center ranks results by match and recency, with highlights, timestamps, and project icons ([#7277](https://github.com/getpaseo/paseo/pull/7277)).
+- Compact workspace forms, settings, headers, and subagent controls have clearer layouts and touch feedback ([#7239](https://github.com/getpaseo/paseo/pull/7239), [#7129](https://github.com/getpaseo/paseo/pull/7129), [#7364](https://github.com/getpaseo/paseo/pull/7364)).
+- Reduce inbound validator memory use ([#6847](https://github.com/getpaseo/paseo/pull/6847) by [@babo-jeonguk](https://github.com/babo-jeonguk)).
+- Skip unchanged workspace-layout writes ([#7358](https://github.com/getpaseo/paseo/pull/7358) by [@colonelpanic8](https://github.com/colonelpanic8)).
+- Stream workspace setup logs only while their setup panel is visible ([#7407](https://github.com/getpaseo/paseo/pull/7407)).
+
+### Fixed
+
+- Preserve streaming replies after reload ([#7256](https://github.com/getpaseo/paseo/pull/7256)).
+- Retain question answers and show retry feedback when submission fails ([#7098](https://github.com/getpaseo/paseo/pull/7098) by [@xzthemeofsss](https://github.com/xzthemeofsss)).
+- Restore file and folder links, correct bare-link punctuation, and keep text selection working in iPhone Safari ([#7251](https://github.com/getpaseo/paseo/pull/7251), [#7233](https://github.com/getpaseo/paseo/pull/7233), [#7229](https://github.com/getpaseo/paseo/pull/7229), [#7361](https://github.com/getpaseo/paseo/pull/7361), [#7360](https://github.com/getpaseo/paseo/pull/7360)).
+- Keep the last successful usage report visible after refresh failures and separate distinct Cursor accounts ([#7246](https://github.com/getpaseo/paseo/pull/7246), [#7344](https://github.com/getpaseo/paseo/pull/7344)).
+- Connect relays on high-latency networks and reconnect Hub after silent connection loss ([#7336](https://github.com/getpaseo/paseo/pull/7336), [#7315](https://github.com/getpaseo/paseo/pull/7315)).
+- Send MCP terminal keys using the running program's input mode ([#7343](https://github.com/getpaseo/paseo/pull/7343) by [@Aling33](https://github.com/Aling33)).
+- OpenCode advertises the agent-scoped tool schemas its calls execute against, preserving notification defaults ([#7383](https://github.com/getpaseo/paseo/pull/7383) by [@gszep](https://github.com/gszep)).
+- Preserve the fork's custom branch names, ntfy delivery, push-token persistence and retries, fork update URLs, and build labels through the upstream merge.
+
+### Distribution
+
+- Mac Apple Silicon DMG/ZIP, Debian 13 amd64 DEB, browser UI bundle, and Docker images for linux/amd64 and linux/arm64. Mac packages remain ad-hoc signed and unnotarized.
+
 ## 0.12.2 - 2026-10-16
 
 ### Added

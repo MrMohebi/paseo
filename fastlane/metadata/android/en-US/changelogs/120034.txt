@@ -1,0 +1,8 @@
+Synced the fork with upstream main through 91154ba4, bringing in 102 upstream commits since v0.12.2. Fork versions remain independent of upstream release numbers.
+
+Added
+- Plugins can use inline SVG and component icons (#7368).
+- Subagent rows show the model and effort beneath the title (#7290).
+- Run, stop, and restart workspace scripts from the compact header menu (#7122).
+
+Full notes: https://github.com/MrMohebi/paseo/releases
