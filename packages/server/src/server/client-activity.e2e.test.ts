@@ -37,7 +37,6 @@ class RecordingPushNotificationSender implements PushNotificationSender {
 describe("client activity tracking", () => {
   const TEST_PROVIDER = "claude";
   const TEST_MODEL = "haiku";
-  const TEST_CWD = "/tmp";
   let daemon: TestPaseoDaemon;
   let client1: DaemonClient;
   let client2: DaemonClient;
@@ -72,13 +71,13 @@ describe("client activity tracking", () => {
     cwd?: string;
   }): Promise<AgentSnapshotPayload> {
     const { workspace } = await params.client.createWorkspace({
-      source: { kind: "directory", path: params.cwd ?? TEST_CWD },
+      source: { kind: "directory", path: params.cwd ?? daemon.staticDir },
     });
     if (!workspace) throw new Error("Workspace creation failed");
     return params.client.createAgent({
       provider: params.provider ?? TEST_PROVIDER,
       model: params.provider === "codex" ? undefined : TEST_MODEL,
-      cwd: params.cwd ?? TEST_CWD,
+      cwd: params.cwd ?? daemon.staticDir,
       workspaceId: workspace.id,
       title: params.title,
       labels: { surface: "activity-test" },
