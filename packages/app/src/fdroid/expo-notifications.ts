@@ -42,3 +42,4 @@ export async function getLastNotificationResponseAsync() {
 export function addPushTokenListener(_listener: unknown) {
   return { remove() {} };
 }
+export function clearLastNotificationResponse(): void {}

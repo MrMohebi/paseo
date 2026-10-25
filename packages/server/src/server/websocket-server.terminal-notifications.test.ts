@@ -1,4 +1,5 @@
 import { resolveNotificationConfig } from "./notifications/notification-config.js";
+import { createWorkspaceRuntimeStore } from "./workspace-runtime-store/index.js";
 import { SessionDelivery } from "./session/owned-subscriptions/index.js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Server as HTTPServer } from "http";
@@ -156,6 +157,7 @@ function createServer(
       notifications: resolveNotificationConfig({ PASEO_NOTIFICATION_MODE: mode }),
     },
     createWorkspaceAutoNameStub(),
+    createWorkspaceRuntimeStore(),
     undefined,
     undefined,
     terminalManager,
